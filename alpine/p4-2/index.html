@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Tooltip met anchor</title>
+    <!-- Eerst de Anchor‑plug‑in, daarna de Alpine core -->
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/@alpinejs/anchor@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css
+" rel="stylesheet">
+</head>
+<body class="p-4">
+<div x-data="{ open: false }" class="position-relative d-inline-block">
+    <!-- De knop opent of sluit de tooltip met een klik; hover-events kunnen
+    onbetrouwbaar zijn -->
+    <button x-ref="help" class="btn btn-info" @click="open = !open">
+        Hulp
+    </button>
+    <div x-show="open" x-anchor.bottom-start="$refs.help" class="alert alert-
+info py-2 px-3" role="alert">
+        Dit is een tooltip met informatie over deze knop.
+    </div>
+</div>
+</body>
+</html>
