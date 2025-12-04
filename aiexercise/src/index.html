@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleek Full Stack Developer Portfolio - Animated</title>
+    <title>Premium Full Stack Developer Portfolio - Animated</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -16,6 +18,9 @@
             ],
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'], // Apply Poppins globally
+                    },
                     colors: {
                         'primary-blue': '#3b82f6',
                         'primary-purple': '#8b5cf6',
@@ -55,9 +60,9 @@
             animation: gradient-move 15s ease infinite;
         }
 
-        /* Skill Bar Animation (Initial state at 0) */
+        /* Skill Bar Animation Setup */
         .skill-bar-fill {
-            width: 0%; /* Default state for animation */
+            width: 0%; /* Start state for the transition */
             transition: width 1.5s ease-out;
         }
 
@@ -71,8 +76,16 @@
         }
 
         /* Intersection Observer driven animation for skill bars */
+        /* This CSS rule is triggered by Alpine adding the 'animate' class */
         .skill-bar-container.animate .skill-bar-fill {
             width: var(--skill-level);
+        }
+
+        /* Subtle background texture for depth */
+        .bg-textured {
+            background-image: radial-gradient(#374155 0.5px, transparent 0.5px);
+            background-size: 10px 10px;
+            opacity: 0.1;
         }
     </style>
 </head>
@@ -82,53 +95,57 @@
     scrolled: false,
     activeSection: 'home',
     sections: ['home', 'about', 'skills', 'projects', 'testimonials', 'contact'],
+    animatedSkills: false, // NEW: Flag to prevent repeated animation
+
     init() {
         window.addEventListener('scroll', () => {
             this.scrolled = window.scrollY > 50;
+
+            // Section tracking and skill animation trigger
             this.sections.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     const rect = el.getBoundingClientRect();
-                    // Track active section and trigger animations
+                    // Check if section is approximately in view (e.g., top is within the top 100px of the viewport)
                     if (rect.top <= 100 && rect.bottom >= 100) {
                         this.activeSection = id;
-                        if (id === 'skills') {
+
+                        // NEW LOGIC: Trigger animation once when 'skills' becomes active
+                        if (id === 'skills' && !this.animatedSkills) {
                             this.animateSkills();
+                            this.animatedSkills = true; // Mark as done
                         }
                     }
                 }
             });
         });
-
-        // Initial check for skill animation
-        this.animateSkills();
+        // Removed this.animateSkills(); from init()
     },
+
     scrollTo(id) {
         document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         this.showMobileMenu = false;
     },
+
     animateSkills() {
-        // Function to trigger skill bar animations when the section is visible
-        const skillSection = document.getElementById('skills');
-        if (skillSection && skillSection.getBoundingClientRect().top < window.innerHeight - 100) {
-            document.querySelectorAll('.skill-bar-container').forEach(container => {
-                container.classList.add('animate');
-            });
-        }
+        // Simplified function: just adds the class to trigger the CSS transition
+        document.querySelectorAll('.skill-bar-container').forEach(container => {
+            container.classList.add('animate');
+        });
     }
 }">
 
-<nav class="bg-gray-800 fixed w-full top-0 z-50 transition-all duration-300 shadow-xl" :class="{ 'bg-gray-900 shadow-2xl': scrolled }">
+<nav class="fixed w-full top-0 z-50 transition-all duration-300 shadow-xl" :class="{ 'bg-gray-900/90 shadow-2xl backdrop-blur-md': scrolled, 'bg-gray-800': !scrolled }">
     <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-extrabold cursor-pointer hover:scale-105 transition-transform duration-300">
-                <span class="gradient-text">FSD Portfolio</span>
+                <span class="gradient-text font-black">FSD Portfolio</span>
             </h1>
 
             <div class="hidden md:flex space-x-6 font-medium">
                 <template x-for="section in sections" :key="section">
                     <a :href="'#' + section" @click.prevent="scrollTo(section)"
-                       class="transition duration-300 hover:text-primary-blue hover:scale-105 transform uppercase text-sm"
+                       class="transition duration-300 hover:text-primary-blue hover:scale-105 transform uppercase text-sm font-semibold"
                        :class="{'text-primary-blue border-b-2 border-primary-blue': activeSection === section}">
                         <span x-text="section.charAt(0).toUpperCase() + section.slice(1)"></span>
                     </a>
@@ -143,11 +160,11 @@
             </button>
         </div>
 
-        <div x-show="showMobileMenu" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" class="md:hidden mt-4 space-y-2 bg-gray-800 p-4 rounded-lg shadow-xl">
+        <div x-show="showMobileMenu" x-cloak x-transition :enter="transition ease-out duration-300" x-transition :enter-start="opacity-0 scale-90" x-transition :enter-end="opacity-100 scale-100" class="md:hidden mt-4 space-y-2 bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-xl">
             <template x-for="section in sections" :key="section">
                 <a :href="'#' + section" @click.prevent="scrollTo(section)"
-                   class="block text-gray-300 hover:text-primary-blue py-2 px-2 rounded hover:bg-gray-700 transition transform duration-300 hover:translate-x-1 uppercase text-sm"
-                   :class="{'bg-gray-700 text-primary-blue': activeSection === section}">
+                   class="block text-gray-300 hover:text-primary-blue py-2 px-2 rounded hover:bg-gray-600 transition transform duration-300 hover:translate-x-1 uppercase text-sm font-medium"
+                   :class="{'bg-gray-600 text-primary-blue font-semibold': activeSection === section}">
                     <span x-text="section.charAt(0).toUpperCase() + section.slice(1)"></span>
                 </a>
             </template>
@@ -180,8 +197,9 @@
 </header>
 
 <main>
-    <section id="about" class="py-24 bg-gray-900 border-t border-gray-800">
-        <div class="container mx-auto px-4">
+    <section id="about" class="py-24 bg-gray-900 border-t border-gray-800 relative overflow-hidden">
+        <div class="absolute inset-0 bg-textured pointer-events-none z-0"></div>
+        <div class="container mx-auto px-4 relative z-10">
             <h2 class="text-4xl font-bold text-center mb-16 text-gray-50 animate-in fade-in-up duration-700">Over Mij 👨‍💻</h2>
             <div class="max-w-5xl mx-auto">
                 <div class="flex flex-col md:flex-row gap-12 items-center">
@@ -282,7 +300,7 @@
                 currentProject: {}
             }">
                 <template x-for="(project, index) in projects" :key="index">
-                    <div class="bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700 hover:border-primary-blue/50 transition-all duration-300 transform hover:scale-[1.02] animate-in fade-in-up"
+                    <div class="bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700 hover:border-primary-blue transition-all duration-300 transform hover:scale-[1.02] cursor-pointer animate-in fade-in-up"
                          :style="`animation-delay: ${index * 150}ms;`"
                          @click="currentProject = project; showModal = true">
 
@@ -303,11 +321,11 @@
                     </div>
                 </template>
 
-                <div x-cloak x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                <div x-cloak x-show="showModal" x-transition :enter="ease-out duration-300" x-transition :enter-start="opacity-0" x-transition :enter-end="opacity-100" x-transition :leave="ease-in duration-200" x-transition :leave-start="opacity-100" x-transition :leave-end="opacity-0"
                      class="fixed inset-0 bg-gray-900 bg-opacity-90 z-[100] flex items-center justify-center p-4" @click.self="showModal = false">
-                    <div x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90"
+                    <div x-transition :enter="ease-out duration-300" x-transition :enter-start="opacity-0 scale-90" x-transition :enter-end="opacity-100 scale-100" x-transition :leave="ease-in duration-200" x-transition :leave-start="opacity-100 scale-100" x-transition :leave-end="opacity-0 scale-90"
                          class="bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
-                        <button @click="showModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10">
+                        <button @click="showModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10 p-2 rounded-full bg-gray-900/50 hover:bg-gray-900">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                         <img :src="currentProject.image" :alt="currentProject.title" class="w-full h-80 object-cover rounded-t-xl opacity-90">
@@ -316,7 +334,7 @@
                             <p class="text-primary-purple font-mono text-lg mb-4" x-text="currentProject.tech"></p>
                             <p class="text-gray-300 text-lg leading-relaxed" x-text="currentProject.desc"></p>
                             <div class="mt-6 flex justify-end">
-                                <a href="#" target="_blank" class="text-white bg-primary-blue hover:bg-primary-purple px-6 py-3 rounded-full font-semibold transition">
+                                <a href="#" target="_blank" class="text-white bg-primary-blue hover:bg-primary-purple px-6 py-3 rounded-full font-semibold transition transform hover:-translate-y-0.5">
                                     Live Demo
                                 </a>
                             </div>
@@ -345,7 +363,7 @@
                     this.currentIndex = (this.currentIndex + 1) % this.testimonials.length;
                 },
                 startAutoScroll() {
-                    this.interval = setInterval(() => this.next(), 5000); // Change every 5 seconds
+                    this.interval = setInterval(() => this.next(), 5000);
                 },
                 stopAutoScroll() {
                     clearInterval(this.interval);
@@ -357,11 +375,11 @@
                             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                         </svg>
                         <template x-for="(testimonial, index) in testimonials" :key="index">
-                            <div x-show="currentIndex === index" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+                            <div x-show="currentIndex === index" x-transition :enter="transition ease-out duration-700" x-transition :enter-start="opacity-0 scale-90" x-transition :enter-end="opacity-100 scale-100" x-transition :leave="transition ease-in duration-300" x-transition :leave-start="opacity-100 scale-100" x-transition :leave-end="opacity-0 scale-90">
                                 <img :src="testimonial.image" :alt="testimonial.name" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover shadow-md border-2 border-primary-blue hover:scale-110 transition-all duration-300 transform">
-                                <p class="text-xl text-gray-300 mb-6 italic font-light" x-text="testimonial.text"></p>
                                 <h4 class="font-bold text-gray-50" x-text="testimonial.name"></h4>
-                                <p class="text-primary-blue text-sm" x-text="testimonial.role"></p>
+                                <p class="text-primary-blue text-sm mb-4" x-text="testimonial.role"></p>
+                                <p class="text-xl text-gray-300 italic font-light" x-text="testimonial.text"></p>
                             </div>
                         </template>
                     </div>
@@ -399,24 +417,25 @@
                     }
                 }" @submit.prevent="submitForm" class="bg-gray-800 p-10 rounded-xl shadow-2xl border border-gray-700 animate-in fade-in-up delay-300">
 
-                    <div x-show="submitted" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" class="bg-green-600/20 border border-green-500 text-green-300 px-4 py-3 rounded-lg mb-6 shadow-md">
+                    <div x-show="submitted" x-transition :enter="transition ease-out duration-300" x-transition :enter-start="opacity-0 scale-90" x-transition :enter-end="opacity-100 scale-100" x-transition :leave="transition ease-in duration-200" x-transition :leave-start="opacity-100 scale-100" x-transition :leave-end="opacity-0 scale-90"
+                         class="bg-green-600/20 border border-green-500 text-green-300 px-4 py-3 rounded-lg mb-6 shadow-md">
                         <p class="font-semibold">✅ Bedankt! Ik neem zo spoedig mogelijk contact met u op.</p>
                     </div>
 
                     <div class="space-y-6">
                         <div>
                             <label class="block text-gray-300 font-semibold mb-2" for="name">Naam</label>
-                            <input x-model="name" type="text" id="name" required class="w-full px-5 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-blue transition">
+                            <input x-model="name" type="text" id="name" required class="w-full px-5 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition">
                         </div>
 
                         <div>
                             <label class="block text-gray-300 font-semibold mb-2" for="email">E-mail</label>
-                            <input x-model="email" type="email" id="email" required class="w-full px-5 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-blue transition">
+                            <input x-model="email" type="email" id="email" required class="w-full px-5 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition">
                         </div>
 
                         <div>
                             <label class="block text-gray-300 font-semibold mb-2" for="message">Bericht</label>
-                            <textarea x-model="message" id="message" rows="5" required class="w-full px-5 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-blue transition"></textarea>
+                            <textarea x-model="message" id="message" rows="5" required class="w-full px-5 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition"></textarea>
                         </div>
 
                         <button type="submit" class="w-full bg-primary-blue text-white py-3 rounded-lg font-bold text-lg hover:bg-primary-purple transition duration-300 transform hover:scale-[1.01] shadow-lg hover:shadow-primary-blue/50">
@@ -428,14 +447,14 @@
                 <div class="mt-12 text-center animate-in fade-in-up delay-500">
                     <p class="text-gray-400 mb-6 font-light">Of maak direct verbinding:</p>
                     <div class="flex justify-center space-x-6">
-                        <a href="#" class="text-primary-blue hover:text-primary-purple transition transform hover:scale-125 duration-300">
+                        <a href="#" class="text-primary-blue hover:text-primary-purple transition transform hover:scale-125 duration-300" aria-label="LinkedIn">
                             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                         </a>
-                        <a href="#" class="text-primary-blue hover:text-primary-purple transition transform hover:scale-125 duration-300">
+                        <a href="#" class="text-primary-blue hover:text-primary-purple transition transform hover:scale-125 duration-300" aria-label="GitHub">
                             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                         </a>
-                        <a href="mailto:contact@example.com" class="text-primary-blue hover:text-primary-purple transition transform hover:scale-125 duration-300">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                        <a href="mailto:contact@example.com" class="text-primary-blue hover:text-primary-purple transition transform hover:scale-125 duration-300" aria-label="Email">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </a>
                     </div>
                 </div>
