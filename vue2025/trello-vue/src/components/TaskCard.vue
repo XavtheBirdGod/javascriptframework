@@ -1,5 +1,6 @@
 <script setup>
-import UserBadge from "./UserBadge.vue"
+import CardFooter from "./CardFooter.vue"
+import TaskTitle from "./TaskTitle.vue"
 
 const props = defineProps({
   title: {
@@ -21,47 +22,49 @@ const props = defineProps({
   priority: {
     type: String,
     default: ""
+  },
+  done: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
 
 <template>
   <article
-      class="rounded-lg bg-gray-800 p-4 shadow-md border border-gray-700 flex flex-col justify-between"
+      class="rounded-lg p-4 shadow-md border border-gray-700"
+      :class="props.done ? 'bg-gray-900' : 'bg-gray-800'"
   >
-    <div>
-        <h3 class="font-semibold text-sm text-white flex justify-between align-middle">
-          {{ props.title }}
-        </h3>
-        <span
-            v-if="props.priority"
-            class="ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium border"
-            :class="
+    <div class="flex items-start justify-between">
+      <TaskTitle
+          :title="props.title"
+          :has-description="!!props.description"
+      />
+
+      <span
+          v-if="props.priority"
+          class="ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium border"
+          :class="
           props.priority === 'hoog'
             ? 'bg-red-500/20 border-red-400/70 text-red-100'
             : props.priority === 'middel'
               ? 'bg-yellow-500/20 border-yellow-400/70 text-yellow-100'
               : 'bg-gray-600/70 border-gray-500/70 text-gray-100'
         "
-        >
+      >
         {{ props.priority }}
       </span>
-
-      <p
-          v-if="props.description"
-          class="text-xs text-gray-300 mt-1 leading-relaxed"
-      >
-        {{ props.description }}
-      </p>
     </div>
 
-    <!-- badges onderaan -->
-    <div class="flex justify-between items-center mt-4">
-      <!-- links: functie -->
-      <UserBadge :label="props.role" type="role" />
+    <p
+        v-if="props.description"
+        class="text-xs text-gray-300 mt-1 leading-relaxed"
+    >
+      {{ props.description }}
+    </p>
 
-      <!-- rechts: naam -->
-      <UserBadge :label="props.assignee" type="assignee" />
-    </div>
+    <slot />
+
+    <CardFooter :role="props.role" :assignee="props.assignee" />
   </article>
 </template>
