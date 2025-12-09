@@ -17,6 +17,10 @@ const props = defineProps({
   role: {
     type: String,
     required: true
+  },
+  priority: {
+    type: String,
+    default: ""
   }
 })
 </script>
@@ -26,9 +30,22 @@ const props = defineProps({
       class="rounded-lg bg-gray-800 p-4 shadow-md border border-gray-700 flex flex-col justify-between"
   >
     <div>
-      <h3 class="font-semibold text-sm text-white">
-        {{ props.title }}
-      </h3>
+        <h3 class="font-semibold text-sm text-white flex justify-between align-middle">
+          {{ props.title }}
+        </h3>
+        <span
+            v-if="props.priority"
+            class="ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium border"
+            :class="
+          props.priority === 'hoog'
+            ? 'bg-red-500/20 border-red-400/70 text-red-100'
+            : props.priority === 'middel'
+              ? 'bg-yellow-500/20 border-yellow-400/70 text-yellow-100'
+              : 'bg-gray-600/70 border-gray-500/70 text-gray-100'
+        "
+        >
+        {{ props.priority }}
+      </span>
 
       <p
           v-if="props.description"
