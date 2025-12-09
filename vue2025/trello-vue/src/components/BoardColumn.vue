@@ -1,5 +1,11 @@
 <script setup>
+import { ref } from "vue"
+
 const props = defineProps({
+  id: {
+    type: String,
+    required: true
+  },
   title: {
     type: String,
     required: true
@@ -13,6 +19,25 @@ const props = defineProps({
     default: "gray"
   }
 })
+
+const showForm = ref(false)
+const newTitle = ref("")
+
+const emit = defineEmits(["add-task"])
+
+const handleColumnAddTask = () => {
+  if (newTitle.value.trim().length === 0) {
+    return;
+  }
+
+  emit("add-task", {
+    columnId: props.id,
+    title: newTitle.value
+  })
+
+  newTitle.value = ""
+  showForm.value = false
+}
 </script>
 
 <template>
@@ -43,9 +68,33 @@ const props = defineProps({
     </div>
 
     <button
-        class="mt-4 w-full rounded-lg bg-gray-700 py-1.5 text-xs font-medium text-gray-200 hover:bg-gray-600"
+        @click="showForm = !showForm"
+        class="mt-4 w-full rounded-lg py-1.5 text-xs font-medium transition-colors"
+        :class="showForm ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-700 text-gray-200 hover:bg-gray-600'"
     >
-      + Kaart toevoegen
+      {{ showForm ? 'X Annuleren' : '+ kaart' }}
     </button>
+
+    <form
+        v-if="showForm"
+        @submit.prevent="handleColumnAddTask"
+        class="mt-3 p-3 bg-gray-700 rounded-lg"
+    >
+      <input
+          type="text"
+          v-model="newTitle"
+          placeholder="Titel van de taak"
+          class="w-full p-2 text-sm bg-gray-600 rounded border border-gray-500 text-white focus:ring-blue-500 focus:border-blue-500"
+      >
+
+      <button
+          type="submit"
+          class="mt-2 w-full py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed"
+          :disabled="newTitle.trim().length === 0"
+      >
+        Taak toevoegen
+      </button>
+    </form>
+
   </section>
 </template>
